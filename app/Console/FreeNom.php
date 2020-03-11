@@ -276,22 +276,26 @@ class FreeNom
     {
         $accounts = [];
         $multipleAccounts = preg_replace('/\s/', '', env('MULTIPLE_ACCOUNTS'));
-        if (preg_match_all('/<(?P<u>.*?)>@<(?P<p>.*?)>/i', $multipleAccounts, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $m) {
+        if ($multipleAccounts) {
+            if (preg_match_all('/<(?P<u>.*?)>@<(?P<p>.*?)>/i', $multipleAccounts, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $m) {
+                    system_log($m);
+                    $accounts[] = [
+                        'username' => $m['u'],
+                        'password' => $m['p']
+                    ];
+                }
+            }
+        } 
+        else {
+            $username = env('FREENOM_USERNAME');
+            $password = env('FREENOM_PASSWORD');
+            if ($username && $password) {
                 $accounts[] = [
-                    'username' => $m['u'],
-                    'password' => $m['p']
+                    'username' => $username,
+                    'password' => $password
                 ];
             }
-        }
-
-        $username = env('FREENOM_USERNAME');
-        $password = env('FREENOM_PASSWORD');
-        if ($username && $password) {
-            $accounts[] = [
-                'username' => $username,
-                'password' => $password
-            ];
         }
 
         if (empty($accounts)) {
